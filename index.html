@@ -26,19 +26,6 @@
             src: url('data:font/woff2;base64,d09GMgABAAAAABMAAA4AAAAAKAAAABKgAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhYbEByCMAZgAIFKCCQJhGURCAqBdIEkCywAATYCJAOEDAQgBYM4ByAMBxu1HyMRNnLwAOxPJmH/RwJ24sB2bOwOYpjYxhQTMzDl6P9/kpOoLaSQvVZ1ujBqG7cN/aZ/w77e88XJH+xiwQqXuVzYP+8+78z7znPm4+fc93nec87MnXvf7737vu/7vm9VxQCCEBMIQQBBEARBEARBEATB/wFYxQBWMYBVDGAVA1jFAFYxgFUMYBX/B/wfAAAAAAAAAAAAAAAA') format('woff2');
         }
 
-        .message-text {
-            font-family: 'Courier New', 'C64', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            letter-spacing: 2px;
-            text-rendering: optimizeSpeed;
-            image-rendering: pixelated;
-            color: #000000;
-            text-shadow: none;
-            white-space: pre-line;
-            font-weight: bold;
-        }
-
         .c64-title {
             font-family: 'Courier New', 'C64', monospace;
             letter-spacing: 3px;
@@ -57,8 +44,8 @@
         .container {
             position: relative;
             width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 4/3;
+            max-width: 600px;
+            aspect-ratio: 2/3;
             background: #3e31a2;
             border: 8px solid #7c71da;
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
@@ -71,28 +58,9 @@
             image-rendering: crisp-edges;
         }
 
-        .message-overlay {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            border: 3px solid rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px 25px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            max-width: 90%;
-            z-index: 10;
-        }
-
-
-
         @media (max-width: 600px) {
-            .message-overlay {
-                padding: 20px 25px;
-            }
-            .message-text {
-                font-size: 14px;
+            .c64-title {
+                font-size: 16px;
             }
         }
     </style>
@@ -101,23 +69,15 @@
     <div class="container">
         <div class="c64-title">*** FROHE WEIHNACHTEN 2025 ***</div>
         <canvas id="scene"></canvas>
-        <div class="message-overlay">
-            <div class="message-text">Lieber Jakob,
-
-schön waren die Feiertage mit Euch, auch wenn ich nur kurz dabei war und mein Geschenk sich nun dank der Wiener Post so sehr verspätet hat. Ich hoffe Du kannst mit dem Geschenk etwas anfangen und hoffe, dass wir uns bald wieder sehen!
-
-Liebe Grüße von Deinem Schwager
-Hannes</div>
-        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('scene');
         const ctx = canvas.getContext('2d');
         
-        // Set canvas size
+        // Set canvas size - portrait format for mobile
         canvas.width = 400;
-        canvas.height = 300;
+        canvas.height = 600;
         
         // C64 color palette
         const colors = {
@@ -146,7 +106,7 @@ Hannes</div>
         for (let i = 0; i < 50; i++) {
             snowflakes.push({
                 x: Math.random() * 400,
-                y: Math.random() * 300,
+                y: Math.random() * 600,
                 speed: 0.3 + Math.random() * 0.5,
                 size: 1 + Math.random() * 2
             });
@@ -256,9 +216,9 @@ Hannes</div>
         ];
 
         function drawHouse() {
-            // Ground
+            // Ground - extend to bottom
             ctx.fillStyle = colors.snow;
-            ctx.fillRect(0, 220, 400, 80);
+            ctx.fillRect(0, 220, 400, 380);
             
             // House structure - back walls only
             ctx.fillStyle = colors.wall;
@@ -403,17 +363,44 @@ Hannes</div>
                 ctx.fillRect(flake.x, flake.y, flake.size, flake.size);
                 flake.y += flake.speed;
                 
-                if (flake.y > 300) {
+                if (flake.y > 600) {
                     flake.y = -10;
                     flake.x = Math.random() * 400;
                 }
             });
         }
 
+        function drawText() {
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            
+            const lines = [
+                'Lieber Jakob,',
+                '',
+                'schön waren die Feiertage mit Euch,',
+                'auch wenn ich nur kurz dabei war und',
+                'mein Geschenk sich nun dank der',
+                'Wiener Post so sehr verspätet hat.',
+                'Ich hoffe Du kannst mit dem Geschenk',
+                'etwas anfangen und hoffe, dass wir',
+                'uns bald wieder sehen!',
+                '',
+                'Liebe Grüße von Deinem Schwager',
+                'Hannes'
+            ];
+            
+            let y = 310;
+            lines.forEach(line => {
+                ctx.fillText(line, 200, y);
+                y += 22;
+            });
+        }
+
         function animate() {
             // Clear canvas
             ctx.fillStyle = colors.sky;
-            ctx.fillRect(0, 0, 400, 300);
+            ctx.fillRect(0, 0, 400, 600);
             
             // Draw scene
             drawSnow();
@@ -428,6 +415,9 @@ Hannes</div>
                 cat.update();
                 cat.draw(frame);
             });
+            
+            // Draw text on snow
+            drawText();
             
             frame++;
             requestAnimationFrame(animate);
